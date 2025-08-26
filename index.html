@@ -1,203 +1,585 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certification Dashboard</title>
+    <title>De la Zero la Erou: Harta Completă a Inginerului Software</title>
     <style>
-        :root { --primary-color: #007B5F; --background-color: #f4f7f6; --card-background: #ffffff; --text-color: #333; --border-color: #ddd; --shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); color: var(--text-color); margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; background: var(--card-background); padding: 20px 30px; border-radius: 12px; box-shadow: var(--shadow); }
-        header h1 { color: var(--primary-color); text-align: center; }
-        
-        .stats-container { display: flex; justify-content: space-around; padding: 15px; background: #f9f9f9; border-radius: 8px; margin-bottom: 25px; }
-        .stat-card { text-align: center; }
-        .stat-card .number { font-size: 2rem; font-weight: bold; color: var(--primary-color); }
-        .stat-card .label { font-size: 0.9rem; color: #666; }
+        :root {
+            --background-color: #f8f9fa;
+            --text-color: #212529;
+            --primary-color: #007bff;
+            --card-background: #ffffff;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --header-bg: #e9ecef;
+        }
 
-        .tabs-container { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; flex-wrap: wrap; }
-        .tab { padding: 10px 15px; cursor: pointer; border: none; background: none; font-size: 1rem; border-bottom: 3px solid transparent; }
-        .tab.active { font-weight: bold; color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: #6c757d;
+        }
+
+        .an-section {
+            margin-bottom: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .an-header {
+            background-color: var(--header-bg);
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         
-        .form-container h3 { margin-top: 0; }
-        #add-cert-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; align-items: center; margin-bottom: 30px; }
-        #add-cert-form input, #add-cert-form select { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; }
+        .an-header:hover {
+            background-color: #d1d8de;
+        }
+
+        .an-header h2 {
+            margin: 0;
+            font-size: 1.8em;
+        }
         
-        .button-group { margin-bottom: 15px; display: flex; gap: 10px; }
-        button { padding: 10px 15px; border: none; border-radius: 6px; background-color: var(--primary-color); color: white; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; }
-        button:hover { background-color: #005A46; }
+        .an-header .toggle-icon {
+            font-size: 1.5em;
+            transition: transform 0.3s;
+        }
+
+        .an-content {
+            display: none;
+            padding: 20px;
+            background-color: var(--card-background);
+        }
+
+        .modul {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+        }
+
+        .modul-header {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+        }
         
-        #cert-table { width: 100%; border-collapse: collapse; }
-        #cert-table th, #cert-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        .status-badge { padding: 4px 8px; border-radius: 12px; color: white; font-size: 0.8rem; font-weight: bold; text-align: center; }
-        .status-Determined { background-color: #2a7c4a; }
-        .status-Pending-Decision { background-color: #b56f00; }
-        .status-In-Training { background-color: #2980b9; }
-        .delete-btn { background-color: #c0392b; }
-        .error-message { color: #c00; text-align: center; font-style: italic; padding: 20px; }
+        .modul-header:hover {
+            background-color: #e9ecef;
+        }
+
+        .modul-header h3 {
+            margin: 0;
+            font-size: 1.4em;
+        }
+
+        .modul-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .modul-content h4 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .modul-content h4:first-child {
+            margin-top: 0;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+        
+        ul li, ol li {
+            margin-bottom: 8px;
+        }
+        
+        code {
+            background-color: #e9ecef;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+
+        .prompt-ai {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-top: 15px;
+            font-style: italic;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .an-section.open .an-content {
+            display: block;
+        }
+        
+        .an-section.open .an-header .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .modul.open .modul-content {
+            display: block;
+        }
+
     </style>
 </head>
 <body>
+
     <div class="container">
-        <header><h1>Certification Dashboard 📋</h1></header>
-        <main>
-            <div class="stats-container" id="stats-header"></div>
-            <div class="tabs-container" id="district-tabs"></div>
-            <div class="form-container">
-                <h3>Add New Employee</h3>
-                <form id="add-cert-form">
-                    <input type="text" id="name-input" placeholder="Name" required>
-                    <input type="text" id="store-input" placeholder="Store" required>
-                    <select id="district-input" required></select>
-                    <input type="date" id="join-date-input" title="Join Date" required>
-                    <select id="status-input" required><option value="Determined">Determined</option><option value="Pending Decision">Pending Decision</option><option value="In Training">In Training</option></select>
-                    <input type="date" id="cert-date-input" title="Cert. Date">
-                    <button type="submit">Add Entry</button>
-                </form>
+        <header>
+            <h1>De la Zero la Erou: Harta Completă a Inginerului Software</h1>
+            <p>O călătorie de 3 ani, structurată, pentru a deveni un inginer software de elită.</p>
+        </header>
+
+        <div class="an-section" id="an1">
+            <div class="an-header">
+                <h2>Anul 1: Fundamentele Ingineriei Software</h2>
+                <span class="toggle-icon">▼</span>
             </div>
-            <div class="button-group">
-                <button id="save-local-button">Save to Browser (Temporary)</button>
-                <button id="download-button">Download Updated JSON File</button>
+            <div class="an-content">
+                <div class="modul">
+                    <div class="modul-header"><h3>Luna 1-3: Fundamente Computer Science cu C/C++</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>Începem cu C și C++ pentru a construi o fundație solidă. Aceste limbaje te forțează să înțelegi cum funcționează memoria la un nivel jos, o cunoaștere esențială care te va diferenția de alți dezvoltatori. Programarea Orientată pe Obiecte (OOP) este paradigma dominantă în industrie, iar C++ este un loc excelent pentru a o stăpâni.</p>
+                        
+                        <h4>Concepte Cheie de Învățat</h4>
+                        <ul>
+                            <li><b>C:</b> Variabile, tipuri de date, pointeri, aritmetică pointeri, alocare dinamică (<code>malloc</code>/<code>free</code>), diferența dintre Stack și Heap.</li>
+                            <li><b>C++:</b> Clase și Obiecte, Constructori/Destructori, Moștenire, Polimorfism (virtual functions), Encapsulare.</li>
+                            <li><b>STL (Standard Template Library):</b> Folosirea containerelor de bază (<code>vector</code>, <code>map</code>, <code>string</code>) și a algoritmilor simpli.</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect)</h4>
+                        <p>Dezvoltă o aplicație simplă de management al unei biblioteci în consolă. Cărțile vor fi obiecte, stocate într-un vector. Aplicația trebuie să permită adăugarea, ștergerea și căutarea cărților. Folosește alocare dinamică pentru a gestiona memoria cărților.</p>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Poți explica clar diferența dintre alocarea pe stack și pe heap unui non-tehnic.</li>
+                            <li>Poți implementa corect moștenirea și polimorfismul (ex: o clasă de bază `Publicatie` și clase derivate `Carte`, `Revista`).</li>
+                            <li>Proiectul tău compilează fără erori și gestionează memoria corect, fără memory leaks.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Compară și contrastează managementul memoriei în C++ (folosind smart pointers ca `std::unique_ptr` și `std::shared_ptr`) cu colectarea automată a gunoiului (garbage collection) din limbaje ca Java sau Python. Care sunt compromisurile (trade-offs) de performanță și siguranță pentru fiecare abordare?"</div>
+                    </div>
+                </div>
+
+                <div class="modul">
+                    <div class="modul-header"><h3>Luna 4-6: Algoritmi și Structuri de Date</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>Aceasta este coloana vertebrală a ingineriei software. Modul în care organizezi și prelucrezi datele determină performanța și scalabilitatea aplicațiilor tale. Stăpânirea acestor concepte este esențială pentru a trece interviurile tehnice și pentru a scrie cod eficient.</p>
+                        
+                        <h4>Concepte Cheie de Învățat</h4>
+                        <ul>
+                            <li><b>Complexitate Algoritmică:</b> Notația Big O (O(1), O(log n), O(n), O(n log n), O(n²)).</li>
+                            <li><b>Structuri de Date Liniare:</b> Array-uri, Liste Înlănțuite, Stive (Stacks), Cozi (Queues).</li>
+                            <li><b>Structuri de Date Non-Liniare:</b> Tabele de dispersie (Hash Maps/Dictionaries).</li>
+                            <li><b>Algoritmi de Bază:</b> Sortare (Bubble, Merge, Quick), Căutare (Liniară, Binară).</li>
+                            <li><b>Rezolvare de Probleme:</b> Abordarea sistematică a problemelor pe platforme precum LeetCode sau HackerRank (focus pe probleme Easy și Medium).</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect)</h4>
+                        <p>Implementează de la zero, în C++, principalele structuri de date: o listă înlănțuită, o stivă, o coadă și un hash map simplu. Pentru fiecare structură, implementează operațiile de bază (adaugare, ștergere, căutare).</p>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Poți analiza complexitatea temporală și spațială a unui algoritm simplu.</li>
+                            <li>Implementările tale ale structurilor de date sunt funcționale și trec un set de teste de bază.</li>
+                            <li>Rezolvi constant 2-3 probleme de pe LeetCode (Easy/Medium) pe săptămână.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Explică-mi compromisurile dintre a folosi un `std::vector` și o `std::list` în C++ pentru un scenariu în care trebuie să inserez frecvent elemente la începutul colecției versus un scenariu în care accesul la elemente după index este prioritar. Cum afectează aceste alegeri alocarea memoriei și performanța cache-ului?"</div>
+                    </div>
+                </div>
+                
+                <div class="modul">
+                    <div class="modul-header"><h3>Luna 7-9: Fundamente Front-End</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>Majoritatea aplicațiilor moderne au o interfață cu utilizatorul. Chiar dacă te vei specializa pe back-end, înțelegerea modului în care este construit și funcționează front-end-ul este crucială pentru a colabora eficient și a construi produse complete. Acum trecem de la consolă la web.</p>
+                        
+                        <h4>Concepte Cheie de Învățat</h4>
+                        <ul>
+                            <li><b>HTML5:</b> Structură semantică (<code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;footer&gt;</code>), formulare și accesibilitate (WCAG).</li>
+                            <li><b>CSS3:</b> Modelul cutie (Box Model), Flexbox, CSS Grid pentru layout-uri complexe, design responsiv (media queries).</li>
+                            <li><b>JavaScript (ES6+):</b> Manipularea DOM (Document Object Model), evenimente, <code>async/await</code> pentru operații asincrone, API-ul <code>fetch</code> pentru cereri de rețea, concepte de bază (closures, hoisting, `this`).</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect)</h4>
+                        <p>Construiește un portofoliu personal static, format dintr-o singură pagină. Folosește HTML semantic pentru structură, CSS Flexbox/Grid pentru un layout modern și responsiv, și adaugă interactivitate cu JavaScript (ex: un formular de contact care validează datele sau un mod întunecat/luminos).</p>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Site-ul tău este perfect responsiv, arătând bine atât pe desktop, cât și pe mobil.</li>
+                            <li>Poți explica diferența dintre <code>let</code>, <code>const</code> și <code>var</code> și scopul `async/await`.</li>
+                            <li>Poți manipula DOM-ul pentru a adăuga, șterge și modifica elemente fără a reîncărca pagina.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Compară CSS Flexbox și CSS Grid. Creează un scenariu de layout complex (ex: o galerie de imagini cu un element principal și mai multe miniaturi) și explică cum l-ai implementa folosind ambele tehnologii, evidențiind avantajele și dezavantajele fiecărei abordări pentru acel scenariu specific."</div>
+                    </div>
+                </div>
+                
+                <div class="modul">
+                    <div class="modul-header"><h3>Luna 10-12: Dezvoltare Full-Stack</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>Acum este momentul să legăm totul. Vei învăța cum partea de client (front-end) comunică cu un server (back-end) și cum datele sunt stocate într-o bază de date. Construirea unei aplicații complete de la un capăt la altul este piatra de temelie a încrederii unui dezvoltator.</p>
+                        
+                        <h4>Concepte Cheie de Învățat</h4>
+                        <ul>
+                            <li><b>Back-End:</b> Node.js ca runtime, Express.js pentru a crea un server și API-uri RESTful.</li>
+                            <li><b>Baze de Date:</b>
+                                <ul>
+                                    <li><b>SQL:</b> PostgreSQL sau MySQL. Concepte de bază (tabele, relații, chei primare/externe), interogări (<code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>JOIN</code>).</li>
+                                    <li><b>NoSQL:</b> MongoDB. Concepte de bază (colecții, documente), diferențe față de SQL.</li>
+                                </ul>
+                            </li>
+                            <li><b>Front-End Framework:</b> React.js. Componente, JSX, state (<code>useState</code>), props, efecte (<code>useEffect</code>), managementul stării aplicației.</li>
+                            <li><b>Arhitectură:</b> Conectarea front-end-ului la back-end folosind API-ul <code>fetch</code> pentru a realiza operații CRUD (Create, Read, Update, Delete).</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect Final Anul 1)</h4>
+                        <p>Construiește o aplicație web completă de tip "To-Do List" sau un blog simplu. Aplicația trebuie să aibă un front-end în React care permite utilizatorilor să creeze, vizualizeze, editeze și șteargă postări/task-uri. Aceste operații trebuie să comunice cu un API REST construit în Node.js/Express, care la rândul său salvează datele într-o bază de date PostgreSQL.</p>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Aplicația ta este complet funcțională: poți adăuga o nouă înregistrare din interfața React, o poți vedea salvată în baza de date și o poți modifica sau șterge.</li>
+                            <li>Înțelegi fluxul complet al unei cereri HTTP: de la click-ul pe un buton în React, la cererea <code>fetch</code>, la procesarea pe serverul Express și la interogarea bazei de date.</li>
+                            <li>Poți explica avantajele folosirii unui framework precum React în comparație cu JavaScript "vanilla" pentru aplicații complexe.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Proiectează schema unei baze de date relaționale (SQL) și a uneia non-relaționale (NoSQL) pentru o aplicație de social media simplă (utilizatori, postări, comentarii, like-uri). Argumentează deciziile de design pentru fiecare model și discută compromisurile legate de performanța interogărilor, scalabilitate și flexibilitatea schemei."</div>
+                    </div>
+                </div>
             </div>
-            <table id="cert-table">
-                <thead><tr><th>Employee</th><th>Store</th><th>Join Date</th><th>Cert. Status</th><th>Cert. Date</th><th>Action</th></tr></thead>
-                <tbody id="cert-list"></tbody>
-            </table>
-        </main>
+        </div>
+
+        <div class="an-section" id="an2">
+            <div class="an-header">
+                <h2>Anul 2: Inginer Software Profesionist</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="an-content">
+                 <div class="modul">
+                    <div class="modul-header"><h3>Trimestrul 1: Profesionalizare și Calitatea Codului</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>A scrie cod care funcționează este doar începutul. Un profesionist scrie cod care este robust, ușor de întreținut, testabil și de înțeles pentru alți dezvoltatori. Acest trimestru se concentrează pe transformarea codului tău de la un proiect personal la un produs de calitate industrială.</p>
+                        
+                        <h4>Concepte Cheie de Învățat</h4>
+                        <ul>
+                            <li><b>TypeScript:</b> Adăugarea de tipuri statice la JavaScript pentru a prinde erori la compilare, nu în producție. Interfețe, tipuri generice.</li>
+                            <li><b>Testare Automatizată:</b>
+                                <ul>
+                                    <li><b>Unit Testing (Jest):</b> Testarea funcțiilor și componentelor izolate.</li>
+                                    <li><b>Integration Testing (Testing Library):</b> Testarea interacțiunii dintre mai multe componente.</li>
+                                </ul>
+                            </li>
+                            <li><b>Clean Code:</b> Principii de scriere a codului curat (nume de variabile sugestive, funcții scurte cu o singură responsabilitate).</li>
+                            <li><b>Principii SOLID:</b> Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion.</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect)</h4>
+                        <p>Refactorizează complet aplicația CRUD din Anul 1. Migrează întregul codebase (atât front-end cât și back-end) la TypeScript. Scrie teste unitare pentru logica de business din back-end și teste de integrare pentru principalele funcționalități din front-end-ul React. Aplică principiile Clean Code și SOLID pe parcursul refactorizării.</p>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Proiectul tău are un nivel de acoperire cu teste (test coverage) de peste 70% pentru logica critică.</li>
+                            <li>Poți explica beneficiile TypeScript și poți oferi un exemplu concret din proiectul tău unde a prevenit un bug.</li>
+                            <li>Poți identifica o încălcare a unui principiu SOLID în codul vechi și poți explica cum refactorizarea ta a rezolvat problema.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Prezintă-mi o funcție complexă din proiectul meu back-end care încalcă Principiul Responsabilității Unice (Single Responsibility Principle). Propune o strategie de refactorizare, arătând cum ai împărți funcția în unități mai mici și mai specializate și cum ai scrie teste unitare pentru fiecare dintre acestea."</div>
+                    </div>
+                </div>
+
+                <div class="modul">
+                    <div class="modul-header"><h3>Trimestrul 2: Proiectarea Sistemelor (System Design)</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>Pe măsură ce aplicațiile cresc, performanța și fiabilitatea devin provocări majore. Acest modul introduce arta și știința de a proiecta sisteme care pot gestiona un număr mare de utilizatori și date. Acesta este pasul de la a construi o aplicație la a arhitecta o soluție scalabilă.</p>
+                        
+                        <h4>Concepte Cheie de Învățat</h4>
+                        <ul>
+                            <li><b>Principii de Scalabilitate:</b> Scalabilitate verticală vs. orizontală.</li>
+                            <li><b>Componente Cheie:</b> Load Balancers, Content Delivery Networks (CDNs), Reverse Proxies.</li>
+                            <li><b>Caching:</b> Strategii de caching (Cache-Aside, Write-Through) și unde să le aplici (client, CDN, server, bază de date).</li>
+                            <li><b>Baze de Date Avansate:</b> Indexare în baze de date (cum funcționează și de ce este importantă), tranzacții ACID, replicare.</li>
+                            <li><b>Arhitecturi:</b> Diferențele fundamentale, avantajele și dezavantajele dintre arhitectura Monolitică și cea de Microservicii.</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect)</h4>
+                        <p>Creează o diagramă de arhitectură detaliată pentru a scala aplicația ta din T1 pentru a servi 1 milion de utilizatori. Documentează unde ai plasa un load balancer, cum ai folosi un CDN pentru conținutul static (imagini, CSS), ce strategie de caching ai aplica pentru datele citite frecvent și cum ai optimiza interogările lente din baza de date prin adăugarea de indecși.</p>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Poți desena și explica pe o tablă albă (sau într-un tool online) arhitectura unui sistem precum Twitter sau Instagram la un nivel înalt.</li>
+                            <li>Poți explica compromisurile (trade-offs) dintre a alege o arhitectură monolitică și una de microservicii pentru proiectul tău.</li>
+                            <li>Poți identifica o interogare lentă în aplicația ta și poți demonstra (teoretic sau practic) cum adăugarea unui index corect îmbunătățește performanța.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Proiectează arhitectura unui serviciu de scurtare a URL-urilor (ca Bitly). Concentrează-te pe modul în care ai gestiona scrierile (generarea de URL-uri noi) și citirile (redirecționările) la scară mare. Discută alegerea bazei de date (SQL vs. NoSQL), strategia de caching și cum ai asigura unicitatea URL-urilor scurte într-un sistem distribuit."</div>
+                    </div>
+                </div>
+
+                <div class="modul">
+                    <div class="modul-header"><h3>Trimestrul 3: DevOps & Cloud</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>A scrie cod este doar o parte a muncii. A-l livra în mod fiabil și eficient către utilizatori este la fel de important. DevOps este cultura și setul de practici care unește dezvoltarea software (Dev) și operațiunile IT (Ops). Cloud-ul oferă infrastructura necesară pentru a face acest lucru posibil la scară largă.</p>
+                        
+                        <h4>Concepte Cheie de Învățat</h4>
+                        <ul>
+                            <li><b>Containerizare:</b> Docker. Crearea de imagini Docker (<code>Dockerfile</code>) pentru a împacheta aplicația și dependențele sale. Docker Compose pentru a orchestra mai multe containere (ex: aplicația și baza de date).</li>
+                            <li><b>CI/CD (Integrare și Livrare Continuă):</b> Automatizarea proceselor de build, testare și deployment.</li>
+                            <li><b>GitHub Actions:</b> Crearea unui pipeline simplu care rulează automat testele la fiecare `push` și care poate face deployment într-un mediu de staging.</li>
+                            <li><b>Platforme Cloud:</b> Introducere în conceptele de bază ale unui furnizor major (AWS, GCP sau Azure). Servicii cheie: mașini virtuale (EC2), baze de date manageriate (RDS), stocare de obiecte (S3).</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect)</h4>
+                        <p>Containerizează aplicația ta full-stack (front-end, back-end, bază de date) folosind Docker și Docker Compose. Creează un pipeline de CI/CD cu GitHub Actions care, la fiecare push pe branch-ul `main`, rulează automat testele. Dacă testele trec, pipeline-ul ar trebui să construiască imaginile Docker și să le publice într-un registru de containere (ex: Docker Hub sau GitHub Container Registry). Bonus: fă deployment manual al containerelor pe o mașină virtuală în cloud.</p>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Poți rula întreaga ta aplicație local cu o singură comandă: <code>docker-compose up</code>.</li>
+                            <li>Pipeline-ul tău de pe GitHub Actions este "verde" (trece cu succes) și rulează automat testele.</li>
+                            <li>Poți explica ce este un container și cum diferă de o mașină virtuală.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Compară și contrastează strategiile de deployment Blue-Green și Canary. Proiectează un pipeline CI/CD în GitHub Actions care implementează o strategie Canary simplificată pentru aplicația mea web, direcționând 10% din trafic către noua versiune și monitorizând rata de erori înainte de a promova versiunea la 100%."</div>
+                    </div>
+                </div>
+                
+                 <div class="modul">
+                    <div class="modul-header"><h3>Trimestrul 4: Computer Science Avansat</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>Acum că ai o bază solidă și experiență practică, este timpul să revii la fundamentele teoretice, dar la un nivel mai profund. Aceste concepte avansate sunt necesare pentru a rezolva probleme mai complexe, a optimiza performanța la limită și a lucra în domenii specializate.</p>
+                        
+                        <h4>Concepte Cheie de Învățat</h4>
+                        <ul>
+                            <li><b>Structuri de Date Avansate:</b> Arbori (Arbori Binari de Căutare, AVL), Grafuri (reprezentări, parcurgeri BFS, DFS), Heap-uri (Min-Heap, Max-Heap).</li>
+                            <li><b>Algoritmi pe Grafuri:</b> Algoritmul lui Dijkstra pentru cel mai scurt drum.</li>
+                            <li><b>Programare Dinamică:</b> O abordare pentru rezolvarea problemelor complexe prin descompunerea lor în subprobleme simple.</li>
+                            <li><b>Concepte de Sisteme de Operare:</b> Procese vs. Thread-uri, scheduling, concurență (mutex, semaphores).</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect)</h4>
+                        <p>Extinde aplicația de blog/to-do pentru a include o funcționalitate de "utilizatori similari" sau "articole recomandate". Implementează un algoritm simplu bazat pe grafuri unde utilizatorii sunt noduri și o muchie există dacă au apreciat același articol. Folosește parcurgerea grafului pentru a găsi recomandări. Rezolvă probleme de pe LeetCode de nivel Medium/Hard care implică aceste structuri de date.</p>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Poți implementa de la zero un Arbore Binar de Căutare, inclusiv operațiile de inserare, ștergere și căutare.</li>
+                            <li>Rezolvi probleme de pe LeetCode care necesită BFS/DFS sau Programare Dinamică.</li>
+                            <li>Poți explica ce este o "race condition" și cum un mutex ajută la prevenirea ei.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Explică problema 'N Queens' și arată cum poate fi rezolvată folosind backtracking. Apoi, compară abordarea backtracking cu o posibilă soluție prin programare dinamică pentru o problemă similară, cum ar fi găsirea tuturor căilor într-o grilă. Care sunt caracteristicile unei probleme care o fac potrivită pentru fiecare dintre aceste tehnici?"</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="an-section" id="an3">
+            <div class="an-header">
+                <h2>Anul 3: Senior Engineer & Specializare</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="an-content">
+                <div class="modul">
+                    <div class="modul-header"><h3>Tema 1: Sisteme Distribuite</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>Aproape toate sistemele moderne la scară largă sunt distribuite. Înțelegerea provocărilor legate de comunicarea între mai multe mașini, consistența datelor și toleranța la erori este ceea ce definește un inginer senior. Aceste concepte sunt complexe, dar esențiale pentru a construi sisteme fiabile.</p>
+                        
+                        <h4>Concepte Cheie de Învățat</h4>
+                        <ul>
+                            <li><b>Teorema CAP:</b> Compromisul fundamental între Consistență (Consistency), Disponibilitate (Availability) și Toleranță la Partiționare (Partition Tolerance).</li>
+                            <li><b>Consistență:</b> Strong Consistency vs. Eventual Consistency.</li>
+                            <li><b>Comunicare:</b> RPC (Remote Procedure Call) vs. Message Queues (ex: RabbitMQ, Apache Kafka).</li>
+                            <li><b>Consens:</b> Înțelegerea problemei consensului și rolul algoritmilor precum Paxos sau Raft (la nivel conceptual).</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect)</h4>
+                        <p>Refactorizează o parte din aplicația ta pentru a folosi un sistem de mesagerie. De exemplu, în loc ca serverul să trimită direct un email de notificare la crearea unui cont, publică un eveniment `USER_CREATED` într-un message queue (RabbitMQ). Creează un serviciu separat ("worker") care consumă mesaje din această coadă și trimite email-ul. Acest lucru decuplează serviciile și crește fiabilitatea.</p>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Poți explica Teorema CAP și poți clasifica diverse baze de date (ex: PostgreSQL, Cassandra) în funcție de caracteristicile pe care le prioritizează (CP vs. AP).</li>
+                            <li>Sistemul tău cu worker funcționează: dacă serviciul de email este căzut, mesajele rămân în coadă și sunt procesate ulterior, fără a bloca procesul de înregistrare.</li>
+                            <li>Înțelegi diferența dintre "at-least-once" și "exactly-once" delivery într-un sistem de mesagerie.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Proiectează un sistem distribuit de procesare a plăților. Analizează deciziile critice legate de consistență (ACID) versus disponibilitate. Cum ai folosi idempotency keys în API pentru a preveni procesarea duplicată a plăților în cazul unor reîncercări (retries) în rețea? Discută rolul unui message queue în acest design."</div>
+                    </div>
+                </div>
+
+                <div class="modul">
+                    <div class="modul-header"><h3>Tema 2: Arhitectură Avansată și Design Patterns</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>Design Patterns sunt soluții testate și reutilizabile la probleme comune de proiectare software. A le cunoaște îți oferă un vocabular comun cu alți ingineri și te ajută să scrii cod mai flexibil și mai ușor de întreținut. Arhitecturile avansate oferă planuri directoare pentru structurarea sistemelor complexe.</p>
+                        
+                        <h4>Concepte Cheie de Învățat</h4>
+                        <ul>
+                            <li><b>Design Patterns Creational:</b> Singleton, Factory, Builder.</li>
+                            <li><b>Design Patterns Structural:</b> Adapter, Decorator, Facade.</li>
+                            <li><b>Design Patterns Behavioral:</b> Observer, Strategy, Command.</li>
+                            <li><b>Domain-Driven Design (DDD):</b> Concepte de bază (Ubiquitous Language, Bounded Context, Aggregate).</li>
+                            <li><b>Arhitecturi Event-Driven:</b> Înțelegerea modului în care sistemele pot reacționa la evenimente în loc să fie bazate pe cereri-răspuns.</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect)</h4>
+                        <p>Refactorizează din nou părți ale codului tău pentru a aplica în mod conștient cel puțin trei Design Patterns. De exemplu, folosește un Factory Pattern pentru crearea diferitelor tipuri de utilizatori, un Observer Pattern pentru notificări, și un Strategy Pattern pentru a permite diferite metode de sortare a datelor. Documentează în cod de ce ai ales fiecare pattern.</p>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Poți identifica și numi pattern-urile folosite în framework-uri populare (ex: Observer în event listeners din JS, Singleton în modulele Node.js).</li>
+                            <li>Codul tău refactorizat este mai decuplat și mai ușor de extins (ex: adăugarea unei noi strategii de sortare nu necesită modificarea logicii existente).</li>
+                            <li>Poți explica ce este un "Bounded Context" din DDD și de ce este util în proiectarea microserviciilor.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Analizează arhitectura aplicației mele CRUD. Propune o tranziție către o arhitectură event-driven folosind principii de Domain-Driven Design. Identifică agregatele cheie (ex: `Post`, `User`) și definește evenimentele de domeniu pe care acestea le-ar emite (ex: `PostCreated`, `CommentAdded`). Cum ar schimba acest lucru modul în care serviciile comunică între ele?"</div>
+                    </div>
+                </div>
+                
+                <div class="modul">
+                    <div class="modul-header"><h3>Tema 3: Specializare Aprofundată</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>Industria software este vastă. A fi un generalist bun este valoros, dar a avea o expertiză profundă într-un domeniu te face excepțional. Acum este momentul să alegi o cale și să te scufunzi în ea, construind un proiect care să demonstreze competențe de nivel senior.</p>
+                        
+                        <h4>Concepte Cheie de Învățat (Exemple de Căi)</h4>
+                        <ul>
+                            <li><b>AI/ML Engineering:</b> Fundamente de Machine Learning (regresie, clasificare), biblioteci (Scikit-learn, PyTorch/TensorFlow), MLOps (cum să pui un model în producție).</li>
+                            <li><b>Cybersecurity:</b> Securitatea aplicațiilor web (OWASP Top 10), criptografie, testare de penetrare (penetration testing).</li>
+                            <li><b>Cloud Native:</b> Kubernetes, Service Mesh (ex: Istio), Observabilitate (Prometheus, Grafana), arhitecturi serverless.</li>
+                            <li><b>Mobile Development:</b> Swift (iOS) sau Kotlin (Android), design de UI specific mobil, managementul ciclului de viață al aplicației.</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect de Portofoliu)</h4>
+                        <p>Dezvoltă un proiect complex în domeniul ales. Exemple:</p>
+                        <ul>
+                            <li><b>AI/ML:</b> Un API care primește o imagine și returnează o descriere text, folosind un model pre-antrenat.</li>
+                            <li><b>Cybersecurity:</b> O aplicație web deliberat vulnerabilă (ca referință pentru alții) și un raport detaliat de securitate despre cum să o repari.</li>
+                            <li><b>Cloud Native:</b> Migrează aplicația ta existentă pentru a rula pe Kubernetes și implementează un pipeline CI/CD complet automatizat cu zero downtime deployments.</li>
+                        </ul>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Proiectul tău de portofoliu este impresionant, bine documentat și demonstrează clar cunoștințe avansate în domeniul ales.</li>
+                            <li>Poți purta o discuție tehnică profundă despre compromisurile și provocările specifice specializării tale.</li>
+                            <li>Ai contribuit la discuții (ex: Stack Overflow, Reddit) sau ai scris un articol de blog despre un subiect din aria ta de expertiză.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Vreau să construiesc un sistem de recomandare de produse pentru un site de e-commerce (specializarea mea este AI/ML). Compară și contrastează abordările de filtrare colaborativă (collaborative filtering) și filtrare bazată pe conținut (content-based filtering) pentru acest scenariu. Schițează arhitectura unui pipeline MLOps pentru antrenarea și deployment-ul periodic al modelului de recomandare, incluzând colectarea datelor, feature engineering, antrenare și servirea predicțiilor online."</div>
+                    </div>
+                </div>
+
+                <div class="modul">
+                    <div class="modul-header"><h3>Tema 4: Leadership Tehnic și Mentorat</h3></div>
+                    <div class="modul-content">
+                        <h4>Context (De ce este important?)</h4>
+                        <p>Un inginer senior nu este doar un contributor individual excepțional, ci și un multiplicator de forță pentru întreaga echipă. Abilitatea de a ghida alți ingineri, de a îmbunătăți procesele și de a comunica eficient idei tehnice complexe este la fel de importantă ca și abilitatea de a scrie cod.</p>
+                        
+                        <h4>Concepte Cheie de Învățat</h4>
+                        <ul>
+                            <li><b>Revizuire de Cod (Code Review) Eficientă:</b> Cum să oferi feedback constructiv, să te concentrezi pe aspectele importante (arhitectură, corectitudine) și să menții un ton pozitiv.</li>
+                            <li><b>Mentorat:</b> Tehnici de a ghida ingineri mai juniori, de a pune întrebări bune în loc de a oferi direct soluții.</li>
+                            <li><b>Comunicare Tehnică:</b> Scrierea de documentație de design tehnic, prezentarea ideilor arhitecturale către un public variat (tehnic și non-tehnic).</li>
+                            <li><b>Contribuții Open Source:</b> Procesul de a contribui la un proiect open-source: de la găsirea unui issue, la crearea unui pull request și la interacțiunea cu maintainerii.</li>
+                        </ul>
+
+                        <h4>Obiectiv Practic (Proiect)</h4>
+                        <p>Găsește un proiect open-source care îți place și la care poți contribui. Începe cu ceva mic: o corectură în documentație, un bug simplu sau scrierea de teste pentru o componentă. Participă activ în procesul de code review, atât oferind, cât și primind feedback. Alternativ, oferă-te să mentorezi un începător, ghidându-l prin primele luni ale acestei hărți de învățare.</p>
+
+                        <h4>Metrici de Succes (Când știi că ai reușit?)</h4>
+                        <ul>
+                            <li>Ai cel puțin o contribuție (un pull request) acceptată într-un proiect open-source respectabil.</li>
+                            <li>Ai realizat o revizuire de cod pentru un coleg (sau un alt contributor open-source) care a fost considerată utilă și constructivă.</li>
+                            <li>Poți scrie un document de design de o pagină pentru o nouă funcționalitate, care este clar și convingător.</li>
+                        </ul>
+
+                        <h4>Prompt Avansat pentru AI</h4>
+                        <div class="prompt-ai">"Generează un exemplu de Pull Request care conține câteva probleme subtile (o potențială race condition, un nume de variabilă neclar și o lipsă de teste). Apoi, acționează ca un inginer senior și scrie un code review exemplar pentru acest PR, oferind feedback specific, constructiv și acționabil, împreună cu sugestii de îmbunătățire și întrebări care încurajează gândirea critică din partea autorului."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const statsHeader = document.getElementById('stats-header');
-            const districtTabs = document.getElementById('district-tabs');
-            const certList = document.getElementById('cert-list');
-            const form = document.getElementById('add-cert-form');
-            const districtInput = document.getElementById('district-input');
-            const saveLocalButton = document.getElementById('save-local-button');
-            const downloadButton = document.getElementById('download-button');
-            
-            let certifications = [];
-            const districts = ["District 1", "District 2", "District 3", "District 4", "District 5", "District 6", "District 7", "District 8"];
+        document.addEventListener('DOMContentLoaded', function () {
+            const anHeaders = document.querySelectorAll('.an-header');
+            const modulHeaders = document.querySelectorAll('.modul-header');
 
-            async function loadInitialData() {
-                const localData = localStorage.getItem('certificationsData');
-                if (localData) {
-                    certifications = JSON.parse(localData);
-                    console.log("Loaded data from Local Storage.");
-                    updateDashboard('District 1');
-                    return;
-                }
-
-                try {
-                    // --- THIS IS THE CORRECTED LINE ---
-                    // It adds a unique timestamp to the URL to prevent caching.
-                    const response = await fetch(`allround-assets/certifications-incoming.json?v=${new Date().getTime()}`);
-
-                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                    const data = await response.json();
-                    certifications = data.certifications;
-                    console.log("Loaded fresh data from JSON file.");
-                    updateDashboard('District 1');
-                } catch (error) {
-                    console.error("Could not load data:", error);
-                    certList.innerHTML = `<tr><td colspan="6" class="error-message">Could not load data. Ensure 'allround-assets/certifications-incoming.json' exists in your repository.</td></tr>`;
-                }
-            }
-
-            function updateDashboard(activeDistrict) {
-                const stats = { total: certifications.length, determined: 0, pending: 0, training: 0 };
-                certifications.forEach(emp => {
-                    if (emp.status === 'Determined') stats.determined++;
-                    else if (emp.status === 'Pending Decision') stats.pending++;
-                    else stats.training++;
+            anHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const anSection = header.parentElement;
+                    anSection.classList.toggle('open');
                 });
-                statsHeader.innerHTML = `
-                    <div class="stat-card"><div class="number">${stats.total}</div><div class="label">Total Employees</div></div>
-                    <div class="stat-card"><div class="number">${stats.determined}</div><div class="label">Certified</div></div>
-                    <div class="stat-card"><div class="number">${stats.pending}</div><div class="label">Pending</div></div>
-                    <div class="stat-card"><div class="number">${stats.training}</div><div class="label">In Training</div></div>`;
-                
-                districtInput.innerHTML = districts.map(d => `<option value="${d}">${d}</option>`).join('');
+            });
 
-                districtTabs.innerHTML = '';
-                districts.forEach(district => {
-                    const tab = document.createElement('button');
-                    tab.className = 'tab';
-                    tab.textContent = district;
-                    if (district === activeDistrict) tab.classList.add('active');
-                    tab.onclick = () => {
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        renderTable(district);
-                    };
-                    districtTabs.appendChild(tab);
+            modulHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const modul = header.parentElement;
+                    modul.classList.toggle('open');
                 });
-                renderTable(activeDistrict);
-            }
-
-            function renderTable(activeDistrict) {
-                certList.innerHTML = '';
-                const filteredCerts = certifications.filter(c => c.district === activeDistrict).sort((a,b) => a.name.localeCompare(b.name));
-                
-                filteredCerts.forEach(emp => {
-                    const statusClass = emp.status.replace(/\s+/g, '-');
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${emp.name}</td>
-                        <td>${emp.store}</td>
-                        <td>${new Date(emp.joinDate).toLocaleDateString('ro-RO')}</td>
-                        <td><span class="status-badge status-${statusClass}">${emp.status}</span></td>
-                        <td>${emp.certificationDate ? new Date(emp.certificationDate).toLocaleDateString('ro-RO') : 'N/A'}</td>
-                        <td><button class="delete-btn" data-name="${emp.name}">Delete</button></td>`;
-                    certList.appendChild(row);
-                });
-            }
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const newEmployee = {
-                    name: document.getElementById('name-input').value,
-                    store: document.getElementById('store-input').value,
-                    district: document.getElementById('district-input').value,
-                    joinDate: document.getElementById('join-date-input').value,
-                    status: document.getElementById('status-input').value,
-                    certificationDate: document.getElementById('cert-date-input').value || null
-                };
-                certifications.push(newEmployee);
-                const activeDistrict = document.querySelector('.tab.active').textContent;
-                updateDashboard(activeDistrict);
-                form.reset();
-                alert('Entry added to the page. Remember to save to browser or download the file.');
             });
-
-            certList.addEventListener('click', (e) => {
-                if (e.target.classList.contains('delete-btn')) {
-                    const nameToDelete = e.target.dataset.name;
-                    if (confirm(`Are you sure you want to delete ${nameToDelete}?`)) {
-                        certifications = certifications.filter(emp => emp.name !== nameToDelete);
-                        const activeDistrict = document.querySelector('.tab.active').textContent;
-                        updateDashboard(activeDistrict);
-                    }
-                }
-            });
-
-            saveLocalButton.addEventListener('click', () => {
-                localStorage.setItem('certificationsData', JSON.stringify(certifications));
-                alert('Changes saved to browser storage for this session.');
-            });
-            
-            downloadButton.addEventListener('click', () => {
-                const dataToDownload = { certifications: certifications };
-                const blob = new Blob([JSON.stringify(dataToDownload, null, 2)], { type: 'application/json' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = 'certifications-updated.json';
-                a.click();
-                URL.revokeObjectURL(a.href);
-            });
-
-            loadInitialData();
         });
     </script>
+
 </body>
 </html>
