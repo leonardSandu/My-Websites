@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certification Dashboard</title>
+    <style>
+        :root { --primary-color: #007B5F; --background-color: #f4f7f6; --card-background: #ffffff; --text-color: #333; --border-color: #ddd; --shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); color: var(--text-color); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; background: var(--card-background); padding: 20px 30px; border-radius: 12px; box-shadow: var(--shadow); }
+        header h1 { color: var(--primary-color); text-align: center; }
+        
+        .stats-container { display: flex; justify-content: space-around; padding: 15px; background: #f9f9f9; border-radius: 8px; margin-bottom: 25px; }
+        .stat-card { text-align: center; }
+        .stat-card .number { font-size: 2rem; font-weight: bold; color: var(--primary-color); }
+        .stat-card .label { font-size: 0.9rem; color: #666; }
+
+        .tabs-container { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 10px 15px; cursor: pointer; border: none; background: none; font-size: 1rem; border-bottom: 3px solid transparent; }
+        .tab.active { font-weight: bold; color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        
+        .form-container h3 { margin-top: 0; }
+        #add-cert-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; align-items: center; margin-bottom: 30px; }
+        #add-cert-form input, #add-cert-form select { padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem; }
+        
+        .button-group { margin-bottom: 15px; display: flex; gap: 10px; }
+        button { padding: 10px 15px; border: none; border-radius: 6px; background-color: var(--primary-color); color: white; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; }
+        button:hover { background-color: #005A46; }
+        
+        #cert-table { width: 100%; border-collapse: collapse; }
+        #cert-table th, #cert-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .status-badge { padding: 4px 8px; border-radius: 12px; color: white; font-size: 0.8rem; font-weight: bold; text-align: center; }
+        .status-Determined { background-color: #2a7c4a; }
+        .status-Pending-Decision { background-color: #b56f00; }
+        .status-In-Training { background-color: #2980b9; }
+        .delete-btn { background-color: #c0392b; }
+        .error-message { color: #c00; text-align: center; font-style: italic; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header><h1>Certification Dashboard 📋</h1></header>
+        <main>
+            <div class="stats-container" id="stats-header"></div>
+            <div class="tabs-container" id="district-tabs"></div>
+            <div class="form-container">
+                <h3>Add New Employee</h3>
+                <form id="add-cert-form">
+                    <input type="text" id="name-input" placeholder="Name" required>
+                    <input type="text" id="store-input" placeholder="Store" required>
+                    <select id="district-input" required></select>
+                    <input type="date" id="join-date-input" title="Join Date" required>
+                    <select id="status-input" required><option value="Determined">Determined</option><option value="Pending Decision">Pending Decision</option><option value="In Training">In Training</option></select>
+                    <input type="date" id="cert-date-input" title="Cert. Date">
+                    <button type="submit">Add Entry</button>
+                </form>
+            </div>
+            <div class="button-group">
+                <button id="save-local-button">Save to Browser (Temporary)</button>
+                <button id="download-button">Download Updated JSON File</button>
+            </div>
+            <table id="cert-table">
+                <thead><tr><th>Employee</th><th>Store</th><th>Join Date</th><th>Cert. Status</th><th>Cert. Date</th><th>Action</th></tr></thead>
+                <tbody id="cert-list"></tbody>
+            </table>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const statsHeader = document.getElementById('stats-header');
+            const districtTabs = document.getElementById('district-tabs');
+            const certList = document.getElementById('cert-list');
+            const form = document.getElementById('add-cert-form');
+            const districtInput = document.getElementById('district-input');
+            const saveLocalButton = document.getElementById('save-local-button');
+            const downloadButton = document.getElementById('download-button');
+            
+            let certifications = [];
+            const districts = ["District 1", "District 2", "District 3", "District 4", "District 5", "District 6", "District 7", "District 8"];
+
+            async function loadInitialData() {
+                const localData = localStorage.getItem('certificationsData');
+                if (localData) {
+                    certifications = JSON.parse(localData);
+                    console.log("Loaded data from Local Storage.");
+                    updateDashboard('District 1');
+                    return;
+                }
+
+                try {
+                    // --- THIS IS THE CORRECTED LINE ---
+                    // It adds a unique timestamp to the URL to prevent caching.
+                    const response = await fetch(`allround-assets/certifications-incoming.json?v=${new Date().getTime()}`);
+
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    const data = await response.json();
+                    certifications = data.certifications;
+                    console.log("Loaded fresh data from JSON file.");
+                    updateDashboard('District 1');
+                } catch (error) {
+                    console.error("Could not load data:", error);
+                    certList.innerHTML = `<tr><td colspan="6" class="error-message">Could not load data. Ensure 'allround-assets/certifications-incoming.json' exists in your repository.</td></tr>`;
+                }
+            }
+
+            function updateDashboard(activeDistrict) {
+                const stats = { total: certifications.length, determined: 0, pending: 0, training: 0 };
+                certifications.forEach(emp => {
+                    if (emp.status === 'Determined') stats.determined++;
+                    else if (emp.status === 'Pending Decision') stats.pending++;
+                    else stats.training++;
+                });
+                statsHeader.innerHTML = `
+                    <div class="stat-card"><div class="number">${stats.total}</div><div class="label">Total Employees</div></div>
+                    <div class="stat-card"><div class="number">${stats.determined}</div><div class="label">Certified</div></div>
+                    <div class="stat-card"><div class="number">${stats.pending}</div><div class="label">Pending</div></div>
+                    <div class="stat-card"><div class="number">${stats.training}</div><div class="label">In Training</div></div>`;
+                
+                districtInput.innerHTML = districts.map(d => `<option value="${d}">${d}</option>`).join('');
+
+                districtTabs.innerHTML = '';
+                districts.forEach(district => {
+                    const tab = document.createElement('button');
+                    tab.className = 'tab';
+                    tab.textContent = district;
+                    if (district === activeDistrict) tab.classList.add('active');
+                    tab.onclick = () => {
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        renderTable(district);
+                    };
+                    districtTabs.appendChild(tab);
+                });
+                renderTable(activeDistrict);
+            }
+
+            function renderTable(activeDistrict) {
+                certList.innerHTML = '';
+                const filteredCerts = certifications.filter(c => c.district === activeDistrict).sort((a,b) => a.name.localeCompare(b.name));
+                
+                filteredCerts.forEach(emp => {
+                    const statusClass = emp.status.replace(/\s+/g, '-');
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${emp.name}</td>
+                        <td>${emp.store}</td>
+                        <td>${new Date(emp.joinDate).toLocaleDateString('ro-RO')}</td>
+                        <td><span class="status-badge status-${statusClass}">${emp.status}</span></td>
+                        <td>${emp.certificationDate ? new Date(emp.certificationDate).toLocaleDateString('ro-RO') : 'N/A'}</td>
+                        <td><button class="delete-btn" data-name="${emp.name}">Delete</button></td>`;
+                    certList.appendChild(row);
+                });
+            }
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newEmployee = {
+                    name: document.getElementById('name-input').value,
+                    store: document.getElementById('store-input').value,
+                    district: document.getElementById('district-input').value,
+                    joinDate: document.getElementById('join-date-input').value,
+                    status: document.getElementById('status-input').value,
+                    certificationDate: document.getElementById('cert-date-input').value || null
+                };
+                certifications.push(newEmployee);
+                const activeDistrict = document.querySelector('.tab.active').textContent;
+                updateDashboard(activeDistrict);
+                form.reset();
+                alert('Entry added to the page. Remember to save to browser or download the file.');
+            });
+
+            certList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-btn')) {
+                    const nameToDelete = e.target.dataset.name;
+                    if (confirm(`Are you sure you want to delete ${nameToDelete}?`)) {
+                        certifications = certifications.filter(emp => emp.name !== nameToDelete);
+                        const activeDistrict = document.querySelector('.tab.active').textContent;
+                        updateDashboard(activeDistrict);
+                    }
+                }
+            });
+
+            saveLocalButton.addEventListener('click', () => {
+                localStorage.setItem('certificationsData', JSON.stringify(certifications));
+                alert('Changes saved to browser storage for this session.');
+            });
+            
+            downloadButton.addEventListener('click', () => {
+                const dataToDownload = { certifications: certifications };
+                const blob = new Blob([JSON.stringify(dataToDownload, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'certifications-updated.json';
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+
+            loadInitialData();
+        });
+    </script>
+</body>
+</html>
